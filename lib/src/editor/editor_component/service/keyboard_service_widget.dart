@@ -240,13 +240,27 @@ class KeyboardServiceWidgetState extends State<KeyboardServiceWidget>
       'keyboard service - attach text input service: $textEditingValue',
     );
     if (textEditingValue != null) {
+      final inCodeBlock = editorState
+          .getNodesInSelection(selection)
+          .any((node) => node.type == 'code');
       textInputService.attach(
         textEditingValue,
         TextInputConfiguration(
           viewId: View.of(context).viewId,
           enableDeltaModel: false,
           inputType: TextInputType.multiline,
-          textCapitalization: TextCapitalization.sentences,
+          // Code blocks must not sentence-capitalize or autocorrect.
+          textCapitalization: inCodeBlock
+              ? TextCapitalization.none
+              : TextCapitalization.sentences,
+          autocorrect: !inCodeBlock,
+          enableSuggestions: !inCodeBlock,
+          smartDashesType: inCodeBlock
+              ? SmartDashesType.disabled
+              : SmartDashesType.enabled,
+          smartQuotesType: inCodeBlock
+              ? SmartQuotesType.disabled
+              : SmartQuotesType.enabled,
           inputAction: TextInputAction.newline,
           keyboardAppearance: Theme.of(context).brightness,
           allowedMimeTypes:
