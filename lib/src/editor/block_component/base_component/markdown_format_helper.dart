@@ -44,7 +44,14 @@ Future<bool> formatMarkdownSymbol(
   if (delta == null) {
     return false;
   }
-  final text = delta.toPlainText().substring(0, selection.end.offset);
+  final plain = delta.toPlainText();
+  if (selection.end.offset > plain.length) {
+    // Stale selection (e.g. an IME/autocorrect replacement shortened the text
+    // before the selection was reconciled) — skip formatting so the typed
+    // character inserts normally instead of throwing a RangeError.
+    return false;
+  }
+  final text = plain.substring(0, selection.end.offset);
 
   // If the text doesn't match the predicate, then we don't want to
   // format it.
