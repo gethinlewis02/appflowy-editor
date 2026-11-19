@@ -12,6 +12,8 @@ linter:
 analyzer:
   exclude:
     - lib/src/l10n/**
+    # Nested Flutter package — analyze via example/pubspec.yaml, not this package.
+    - example/**
   plugins:
     - custom_lint
 
